@@ -1,4 +1,4 @@
-import type { MemberMetrics, LinearIssue } from './types';
+import type { MemberMetrics, LinearIssue, UnresponsiveMention } from './types';
 
 function issueList(issues: LinearIssue[], id: string): string {
   if (issues.length === 0) return '';
@@ -26,6 +26,21 @@ function initials(name: string): string {
     .join('')
     .toUpperCase()
     .slice(0, 2);
+}
+
+function alertBadge(mentions: UnresponsiveMention[], idx: number): string {
+  const items = mentions
+    .map(m => `<li><a href="${m.issueUrl}" target="_blank" rel="noopener">${m.issueIdentifier}</a> ${escapeHtml(m.issueTitle)}<span class="mention-date">${new Date(m.mentionedAt).toLocaleDateString()}</span></li>`)
+    .join('');
+  return `
+    <details class="alert-badge-wrapper">
+      <summary class="alert-badge" title="${mentions.length} unresponded mention${mentions.length !== 1 ? 's' : ''}">!</summary>
+      <div class="alert-dropdown" id="alert-${idx}">
+        <div class="alert-dropdown-title">Unresponded mentions (${mentions.length})</div>
+        <ul>${items}</ul>
+      </div>
+    </details>
+  `;
 }
 
 function metricCard(label: string, count: number, issues: LinearIssue[], id: string, colorClass: string): string {
@@ -88,13 +103,19 @@ export function renderDashboard(metrics: MemberMetrics[], date: string): void {
         : `<div class="avatar avatar-placeholder">${initials(m.user.name)}</div>`;
 
       const hasActivity = m.interacted.length > 0;
+      const alertHtml = m.unresponsiveMentions.length > 0
+        ? alertBadge(m.unresponsiveMentions, idx)
+        : '';
 
       return `
-        <div class="member-card ${hasActivity ? '' : 'inactive'}">
+        <div class="member-card ${hasActivity ? '' : 'inactive'} ${m.unresponsiveMentions.length > 0 ? 'has-alert' : ''}">
           <div class="member-header">
             ${avatar}
             <div class="member-info">
-              <h3>${escapeHtml(m.user.displayName || m.user.name)}</h3>
+              <div class="member-name-row">
+                <h3>${escapeHtml(m.user.name)}</h3>
+                ${alertHtml}
+              </div>
               ${!hasActivity ? '<span class="badge-inactive">No activity</span>' : ''}
             </div>
           </div>
@@ -108,6 +129,16 @@ export function renderDashboard(metrics: MemberMetrics[], date: string): void {
       `;
     })
     .join('');
+
+  grid.querySelectorAll<HTMLDetailsElement>('.alert-badge-wrapper').forEach(detail => {
+    detail.addEventListener('toggle', () => {
+      if (detail.open) {
+        grid.querySelectorAll<HTMLDetailsElement>('.alert-badge-wrapper').forEach(other => {
+          if (other !== detail) other.open = false;
+        });
+      }
+    });
+  });
 }
 
 export function showLoading(): void {

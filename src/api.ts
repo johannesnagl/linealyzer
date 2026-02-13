@@ -1,4 +1,4 @@
-import type { LinearTeam, LinearUser, LinearIssue, LinearHistoryEntry, PageInfo } from './types';
+import type { LinearTeam, LinearUser, LinearIssue, LinearHistoryEntry, LinearComment, PageInfo } from './types';
 import { getCached, setCache } from './cache';
 
 const API_URL = 'https://api.linear.app/graphql';
@@ -210,6 +210,73 @@ export async function fetchTeamIssuesCompletedOn(
 
   setCache(cacheKey, issues);
   return issues;
+}
+
+export async function fetchTeamIssueComments(
+  token: string,
+  teamId: string,
+  since: string,
+): Promise<LinearComment[]> {
+  const cacheKey = `comments_${teamId}_${since}`;
+  const cached = getCached<LinearComment[]>(cacheKey);
+  if (cached) return cached;
+
+  const query = `
+    query TeamIssueComments($teamId: ID, $since: DateTimeOrDuration!, $after: String) {
+      issues(
+        filter: {
+          team: { id: { eq: $teamId } }
+          updatedAt: { gte: $since }
+        }
+        first: 100
+        after: $after
+      ) {
+        nodes {
+          id identifier title url
+          comments {
+            nodes {
+              id body createdAt
+              user { id name }
+              reactions { user { id } }
+            }
+          }
+        }
+        pageInfo { hasNextPage endCursor }
+      }
+    }
+  `;
+
+  interface RawIssueWithComments {
+    id: string;
+    identifier: string;
+    title: string;
+    url: string;
+    comments: {
+      nodes: { id: string; body: string; createdAt: string; user: { id: string; name: string } | null; reactions: { user: { id: string } }[] }[];
+    };
+  }
+
+  const issues = await fetchAllPages<RawIssueWithComments>(token, query, { teamId, since }, (d) => {
+    const t = d as { issues: { nodes: RawIssueWithComments[]; pageInfo: PageInfo } };
+    return t.issues;
+  });
+
+  const comments: LinearComment[] = [];
+  for (const issue of issues) {
+    for (const c of issue.comments.nodes) {
+      comments.push({
+        id: c.id,
+        body: c.body,
+        createdAt: c.createdAt,
+        user: c.user,
+        reactorIds: (c.reactions || []).map(r => r.user.id),
+        issue: { id: issue.id, identifier: issue.identifier, title: issue.title, url: issue.url },
+      });
+    }
+  }
+
+  setCache(cacheKey, comments);
+  return comments;
 }
 
 export async function fetchIssueHistory(

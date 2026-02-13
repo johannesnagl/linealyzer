@@ -370,6 +370,116 @@ select:focus {
   grid-column: 1 / -1;
 }
 
+.member-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.alert-badge-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.alert-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: var(--accent-red);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  border-radius: 50%;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  line-height: 1;
+  flex-shrink: 0;
+  animation: pulse-alert 2s ease-in-out infinite;
+}
+
+.alert-badge::-webkit-details-marker {
+  display: none;
+}
+
+.alert-badge:hover {
+  background: #ff6b63;
+}
+
+@keyframes pulse-alert {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.5); }
+  50% { box-shadow: 0 0 0 6px rgba(248, 81, 73, 0); }
+}
+
+.alert-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--accent-red);
+  border-radius: var(--radius);
+  padding: 12px;
+  min-width: 300px;
+  max-width: 400px;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.alert-dropdown-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-red);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.alert-dropdown ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.alert-dropdown li {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.alert-dropdown a {
+  color: var(--accent-blue);
+  text-decoration: none;
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.alert-dropdown a:hover {
+  text-decoration: underline;
+}
+
+.mention-date {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+.member-card.has-alert {
+  border-color: var(--accent-red);
+}
+
+.member-card.has-alert:hover {
+  border-color: #ff6b63;
+}
+
 .hidden {
   display: none !important;
 }

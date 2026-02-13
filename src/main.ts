@@ -1,5 +1,5 @@
 import './style.css';
-import { fetchTeams, fetchTeamMembers, fetchTeamIssuesUpdatedOn, fetchTeamIssuesCreatedOn, fetchTeamIssuesCompletedOn } from './api';
+import { fetchTeams, fetchTeamMembers, fetchTeamIssuesUpdatedOn, fetchTeamIssuesCreatedOn, fetchTeamIssuesCompletedOn, fetchTeamIssueComments } from './api';
 import { computeMetrics } from './metrics';
 import { renderDashboard, showLoading, hideLoading, showError } from './ui';
 import type { LinearTeam } from './types';
@@ -86,14 +86,19 @@ async function loadDashboard(): Promise<void> {
     const dateStart = localDateToISO(date, false);
     const dateEnd = localDateToISO(date, true);
 
-    const [members, updatedIssues, createdIssues, completedIssues] = await Promise.all([
+    const lookbackDate = new Date(date + 'T00:00:00');
+    lookbackDate.setDate(lookbackDate.getDate() - 14);
+    const commentsSince = lookbackDate.toISOString();
+
+    const [members, updatedIssues, createdIssues, completedIssues, comments] = await Promise.all([
       fetchTeamMembers(token, teamId),
       fetchTeamIssuesUpdatedOn(token, teamId, dateStart, dateEnd),
       fetchTeamIssuesCreatedOn(token, teamId, dateStart, dateEnd),
       fetchTeamIssuesCompletedOn(token, teamId, dateStart, dateEnd),
+      fetchTeamIssueComments(token, teamId, commentsSince),
     ]);
 
-    const metrics = computeMetrics(members, updatedIssues, createdIssues, completedIssues);
+    const metrics = computeMetrics(members, updatedIssues, createdIssues, completedIssues, comments);
     hideLoading();
     renderDashboard(metrics, date);
   } catch (err) {
