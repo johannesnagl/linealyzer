@@ -12,6 +12,7 @@ const tokenToggle = document.getElementById('token-toggle') as HTMLButtonElement
 const teamSelect = document.getElementById('team-select') as HTMLSelectElement;
 const dateInput = document.getElementById('date-input') as HTMLInputElement;
 const loadBtn = document.getElementById('load-btn') as HTMLButtonElement;
+const mentionsToggle = document.getElementById('mentions-toggle') as HTMLInputElement;
 
 let teams: LinearTeam[] = [];
 
@@ -50,6 +51,10 @@ teamSelect.addEventListener('change', () => {
 });
 
 loadBtn.addEventListener('click', loadDashboard);
+
+mentionsToggle.addEventListener('change', () => {
+  document.getElementById('members-grid')!.classList.toggle('show-mentions', mentionsToggle.checked);
+});
 
 async function loadTeams(token: string): Promise<void> {
   try {

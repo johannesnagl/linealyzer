@@ -378,6 +378,10 @@ select:focus {
 
 .alert-badge-wrapper {
   position: relative;
+  display: none;
+}
+
+.show-mentions .alert-badge-wrapper {
   display: inline-block;
 }
 
@@ -516,12 +520,31 @@ select:focus {
   border-color: var(--accent-green);
 }
 
-.member-card.has-alert {
+.show-mentions .member-card.has-alert {
   border-color: var(--accent-red);
 }
 
-.member-card.has-alert:hover {
+.show-mentions .member-card.has-alert:hover {
   border-color: #ff6b63;
+}
+
+.checkbox-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+.checkbox-control input[type="checkbox"] {
+  accent-color: var(--accent-red);
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
 }
 
 .hidden {
