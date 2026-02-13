@@ -1,4 +1,5 @@
 import type { MemberMetrics, LinearIssue, UnresponsiveMention } from './types';
+import { createComment } from './api';
 
 function issueList(issues: LinearIssue[], id: string): string {
   if (issues.length === 0) return '';
@@ -28,9 +29,9 @@ function initials(name: string): string {
     .slice(0, 2);
 }
 
-function alertBadge(mentions: UnresponsiveMention[], idx: number): string {
+function alertBadge(mentions: UnresponsiveMention[], idx: number, userName: string): string {
   const items = mentions
-    .map(m => `<li><a href="${m.issueUrl}" target="_blank" rel="noopener">${m.issueIdentifier}</a> ${escapeHtml(m.issueTitle)}<span class="mention-date">${new Date(m.mentionedAt).toLocaleDateString()}</span></li>`)
+    .map((m, mIdx) => `<li><a href="${m.issueUrl}" target="_blank" rel="noopener">${m.issueIdentifier}</a><span class="issue-title-text">${escapeHtml(m.issueTitle)}</span><span class="mention-date">${new Date(m.mentionedAt).toLocaleDateString()}</span><button class="ping-btn" data-member="${idx}" data-mention="${mIdx}" data-issue-id="${m.issueId}" data-comment-id="${m.commentId}" data-user-name="${escapeHtml(userName)}" title="Ping @${escapeHtml(userName)}">\uD83C\uDFD3</button></li>`)
     .join('');
   return `
     <details class="alert-badge-wrapper">
@@ -104,7 +105,7 @@ export function renderDashboard(metrics: MemberMetrics[], date: string): void {
 
       const hasActivity = m.interacted.length > 0;
       const alertHtml = m.unresponsiveMentions.length > 0
-        ? alertBadge(m.unresponsiveMentions, idx)
+        ? alertBadge(m.unresponsiveMentions, idx, m.user.name)
         : '';
 
       return `
@@ -136,6 +137,31 @@ export function renderDashboard(metrics: MemberMetrics[], date: string): void {
         grid.querySelectorAll<HTMLDetailsElement>('.alert-badge-wrapper').forEach(other => {
           if (other !== detail) other.open = false;
         });
+      }
+    });
+  });
+
+  grid.querySelectorAll<HTMLButtonElement>('.ping-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const token = localStorage.getItem('linealyzer_token');
+      if (!token) return;
+
+      const issueId = btn.dataset.issueId!;
+      const commentId = btn.dataset.commentId!;
+      const userName = btn.dataset.userName!;
+
+      btn.disabled = true;
+      btn.textContent = '\u2026';
+
+      try {
+        await createComment(token, issueId, `PING @${userName}`, commentId);
+        btn.textContent = '\u2705';
+        btn.classList.add('ping-sent');
+      } catch {
+        btn.textContent = '\u274C';
+        btn.disabled = false;
       }
     });
   });

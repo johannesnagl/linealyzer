@@ -49,9 +49,11 @@ export interface LinearComment {
 }
 
 export interface UnresponsiveMention {
+  issueId: string;
   issueIdentifier: string;
   issueTitle: string;
   issueUrl: string;
+  commentId: string;
   mentionedAt: string;
   commentSnippet: string;
 }

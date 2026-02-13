@@ -279,6 +279,26 @@ export async function fetchTeamIssueComments(
   return comments;
 }
 
+export async function createComment(
+  token: string,
+  issueId: string,
+  body: string,
+  parentId?: string,
+): Promise<void> {
+  const query = `
+    mutation CreateComment($input: CommentCreateInput!) {
+      commentCreate(input: $input) {
+        success
+      }
+    }
+  `;
+
+  const input: Record<string, string> = { issueId, body };
+  if (parentId) input.parentId = parentId;
+
+  await gql(token, query, { input });
+}
+
 export async function fetchIssueHistory(
   token: string,
   issueId: string,

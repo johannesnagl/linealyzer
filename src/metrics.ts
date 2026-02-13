@@ -52,9 +52,11 @@ function findUnresponsiveMentions(
 
       if (!reacted && !replied && now.getTime() > deadline) {
         results.push({
+          issueId: comment.issue.id,
           issueIdentifier: comment.issue.identifier,
           issueTitle: comment.issue.title,
           issueUrl: comment.issue.url,
+          commentId: comment.id,
           mentionedAt: comment.createdAt,
           commentSnippet: comment.body.slice(0, 120),
         });

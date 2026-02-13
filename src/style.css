@@ -450,9 +450,27 @@ select:focus {
   font-size: 13px;
   color: var(--text-secondary);
   line-height: 2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   white-space: nowrap;
+  min-width: 0;
+}
+
+.alert-dropdown li a {
+  flex-shrink: 0;
+}
+
+.alert-dropdown li .issue-title-text {
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.alert-dropdown li .mention-date,
+.alert-dropdown li .ping-btn {
+  flex-shrink: 0;
 }
 
 .alert-dropdown a {
@@ -470,6 +488,32 @@ select:focus {
   font-size: 10px;
   color: var(--text-muted);
   margin-left: 4px;
+}
+
+.ping-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 2px 6px;
+  margin-left: 6px;
+  vertical-align: middle;
+  transition: border-color 0.15s, opacity 0.15s;
+}
+
+.ping-btn:hover:not(:disabled) {
+  border-color: var(--accent-blue);
+}
+
+.ping-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.ping-btn.ping-sent {
+  border-color: var(--accent-green);
 }
 
 .member-card.has-alert {
