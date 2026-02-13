@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Linealyzer</title>
+  </head>
+  <body>
+    <div id="app">
+      <header id="header">
+        <div class="header-left">
+          <h1>Linealyzer</h1>
+        </div>
+        <div class="header-controls">
+          <div class="control-group">
+            <label for="token-input">API Token</label>
+            <div class="token-wrapper">
+              <input type="password" id="token-input" placeholder="lin_api_..." />
+              <button id="token-toggle" title="Show/hide token">&#128065;</button>
+            </div>
+          </div>
+          <div class="control-group">
+            <label for="team-select">Team</label>
+            <select id="team-select" disabled>
+              <option value="">Enter token first</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label for="date-input">Date</label>
+            <input type="date" id="date-input" />
+          </div>
+          <button id="load-btn" disabled>Load</button>
+        </div>
+      </header>
+      <main id="dashboard">
+        <div id="summary-bar" class="hidden"></div>
+        <div id="members-grid"></div>
+        <div id="empty-state">
+          <p>Enter your Linear API token, select a team, and click Load to get started.</p>
+        </div>
+        <div id="loading-state" class="hidden">
+          <div class="spinner"></div>
+          <p>Fetching data from Linear...</p>
+        </div>
+      </main>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
